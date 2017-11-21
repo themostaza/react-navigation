@@ -139,9 +139,7 @@ class CardStack extends React.Component<Props> {
     const { screenProps, navigation, router } = this.props;
     let screenDetails = this._screenDetails[scene.key];
     if (!screenDetails || screenDetails.state !== scene.route) {
-      const screenNavigation: NavigationScreenProp<
-        NavigationRoute
-      > = addNavigationHelpers({
+      const screenNavigation: NavigationScreenProp<NavigationRoute> = addNavigationHelpers({
         dispatch: navigation.dispatch,
         state: scene.route,
       });
@@ -216,9 +214,7 @@ class CardStack extends React.Component<Props> {
       this._immediateIndex = null;
       const backFromScene = scenes.find((s: *) => s.index === toValue + 1);
       if (!this._isResponding && backFromScene) {
-        navigation.dispatch(
-          NavigationActions.back({ key: backFromScene.route.key })
-        );
+        navigation.dispatch(NavigationActions.back({ key: backFromScene.route.key }));
       }
     });
   }
@@ -251,14 +247,10 @@ class CardStack extends React.Component<Props> {
         if (index !== scene.index) {
           return false;
         }
-        const immediateIndex =
-          this._immediateIndex == null ? index : this._immediateIndex;
+        const immediateIndex = this._immediateIndex == null ? index : this._immediateIndex;
         const currentDragDistance = gesture[isVertical ? 'dy' : 'dx'];
-        const currentDragPosition =
-          event.nativeEvent[isVertical ? 'pageY' : 'pageX'];
-        const axisLength = isVertical
-          ? layout.height.__getValue()
-          : layout.width.__getValue();
+        const currentDragPosition = event.nativeEvent[isVertical ? 'pageY' : 'pageX'];
+        const axisLength = isVertical ? layout.height.__getValue() : layout.width.__getValue();
         const axisHasBeenMeasured = !!axisLength;
 
         // Measure the distance from the touch to the edge of the screen
@@ -268,31 +260,25 @@ class CardStack extends React.Component<Props> {
           gestureResponseDistance: userGestureResponseDistance = {},
         } = this._getScreenDetails(scene).options;
         const gestureResponseDistance = isVertical
-          ? userGestureResponseDistance.vertical ||
-            GESTURE_RESPONSE_DISTANCE_VERTICAL
-          : userGestureResponseDistance.horizontal ||
-            GESTURE_RESPONSE_DISTANCE_HORIZONTAL;
+          ? userGestureResponseDistance.vertical || GESTURE_RESPONSE_DISTANCE_VERTICAL
+          : userGestureResponseDistance.horizontal || GESTURE_RESPONSE_DISTANCE_HORIZONTAL;
         // GESTURE_RESPONSE_DISTANCE is about 25 or 30. Or 135 for modals
         if (screenEdgeDistance > gestureResponseDistance) {
           // Reject touches that started in the middle of the screen
           return false;
         }
 
-        const hasDraggedEnough =
-          Math.abs(currentDragDistance) > RESPOND_THRESHOLD;
+        const hasDraggedEnough = Math.abs(currentDragDistance) > RESPOND_THRESHOLD;
 
         const isOnFirstCard = immediateIndex === 0;
-        const shouldSetResponder =
-          hasDraggedEnough && axisHasBeenMeasured && !isOnFirstCard;
+        const shouldSetResponder = hasDraggedEnough && axisHasBeenMeasured && !isOnFirstCard;
         return shouldSetResponder;
       },
       onPanResponderMove: (event: any, gesture: any) => {
         // Handle the moving touches for our granted responder
         const startValue = this._gestureStartValue;
         const axis = isVertical ? 'dy' : 'dx';
-        const axisDistance = isVertical
-          ? layout.height.__getValue()
-          : layout.width.__getValue();
+        const axisDistance = isVertical ? layout.height.__getValue() : layout.width.__getValue();
         const currentValue =
           I18nManager.isRTL && axis === 'dx'
             ? startValue + gesture[axis] / axisDistance
@@ -310,13 +296,10 @@ class CardStack extends React.Component<Props> {
         }
         this._isResponding = false;
 
-        const immediateIndex =
-          this._immediateIndex == null ? index : this._immediateIndex;
+        const immediateIndex = this._immediateIndex == null ? index : this._immediateIndex;
 
         // Calculate animate duration according to gesture speed and moved distance
-        const axisDistance = isVertical
-          ? layout.height.__getValue()
-          : layout.width.__getValue();
+        const axisDistance = isVertical ? layout.height.__getValue() : layout.width.__getValue();
         const movedDistance = gesture[isVertical ? 'dy' : 'dx'];
         const gestureVelocity = gesture[isVertical ? 'vy' : 'vx'];
         const defaultVelocity = axisDistance / ANIMATION_DURATION;
@@ -355,16 +338,11 @@ class CardStack extends React.Component<Props> {
         : Platform.OS === 'ios';
 
     const handlers = gesturesEnabled ? responder.panHandlers : {};
-    const containerStyle = [
-      styles.container,
-      this._getTransitionConfig().containerStyle,
-    ];
+    const containerStyle = [styles.container, this._getTransitionConfig().containerStyle];
 
     return (
       <View {...handlers} style={containerStyle}>
-        <View style={styles.scenes}>
-          {scenes.map((s: *) => this._renderCard(s))}
-        </View>
+        <View style={styles.scenes}>{scenes.map((s: *) => this._renderCard(s))}</View>
         {floatingHeader}
       </View>
     );
@@ -380,10 +358,7 @@ class CardStack extends React.Component<Props> {
     return 'float';
   }
 
-  _renderInnerScene(
-    SceneComponent: NavigationComponent,
-    scene: NavigationScene
-  ): React.Node {
+  _renderInnerScene(SceneComponent: NavigationComponent, scene: NavigationScene): React.Node {
     const { navigation } = this._getScreenDetails(scene);
     const { screenProps } = this.props;
     const headerMode = this._getHeaderMode();
@@ -425,12 +400,12 @@ class CardStack extends React.Component<Props> {
 
   _renderCard = (scene: NavigationScene): React.Node => {
     const { screenInterpolator } = this._getTransitionConfig();
-    const style =
-      screenInterpolator && screenInterpolator({ ...this.props, scene });
+    const style = screenInterpolator && screenInterpolator({ ...this.props, scene });
 
-    const SceneComponent = this.props.router.getComponentForRouteName(
-      scene.route.routeName
-    );
+    const SceneComponent = this.props.router.getComponentForRouteName(scene.route.routeName);
+    if (!scene.isActive) {
+      return <View key={`card_${scene.key}`} />;
+    }
 
     return (
       <Card
